@@ -1,0 +1,34 @@
+body, html {
+    margin: 0;
+    padding: 0;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+}
+
+.content h1 {
+    font-family: Roboto-Regular;
+    font-size: 10vw;
+    font-weight: 100;
+    color: #161616;
+}
+
+.content a {
+    text-decoration: none;
+    color: #2c2c2c;
+    transition: 250ms ease-in-out;
+}
+.content h2 {
+    font-family: PlayfairDisplay-Regular;
+    font-size: 2vw;
+}
+
+.content a:hover {
+    color: #A47D00;
+}
