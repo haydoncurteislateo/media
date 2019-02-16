@@ -14,7 +14,18 @@ body,html {
     justify-content: center;
 }
 
-.content label {
+.scores {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.scores div {
+    margin: 0 50px;
+}
+
+.scores label {
     font-size: 32px;
     font-family: Arial, Helvetica, sans-serif;
     display: block;
@@ -23,7 +34,8 @@ body,html {
     margin-top: 50px;
 }
 
-.content p {
+.scores p {
+    text-align: center;
     font-size: 28px;
     margin: 0;
 }

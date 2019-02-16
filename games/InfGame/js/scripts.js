@@ -6,8 +6,8 @@ var player = {x:50,y:canvas.height-500,r:25,yv:0,jumping:false,colliding:false,p
 var container = {x:0,y:0,width:canvas.width,height:canvas.height - 25};
 var floor = {x:0,y:canvas.height - 25,width:canvas.width,height:25};
 var barrier = {x:canvas.width + 50,y:canvas.height - 150,width:50,height:125,xv:0};
-var score = 0;
-var scoreTXT = document.getElementById('scoreTXT');
+var score = {value:0,txt:document.getElementById('scoreTXT')};
+var highScore = {value:0,txt:document.getElementById('highScoreTXT')};
 
 
 controller = {
@@ -100,8 +100,8 @@ function draw() {
     // add score
     if ((Math.ceil((player.x + player.r) / 10) * 10) === (Math.ceil((barrier.x + barrier.width) / 10) * 10) && !collisionDetection(player, barrier)) {
         if (!player.pointGained) {
-            score += 1;
-            scoreTXT.textContent = score;
+            score.value += 1;
+            score.txt.textContent = score.value;
             player.pointGained = true;
         }
     }else {
@@ -109,11 +109,17 @@ function draw() {
     }
     // console.log(Math.ceil(barrier.x + barrier.width / 10) * 10);
 
-    //reset score when player hits barrier
+    //reset score when player hits barrier and set high score if score higher than last
     if (collisionDetection(player, barrier)) {
         player.colliding = true;
-        score = 0;
-        scoreTXT.textContent = score;
+
+        if (score.value > highScore.value) {
+            highScore.value = score.value;
+            highScore.txt.textContent = highScore.value;
+        }
+
+        score.value = 0;
+        score.txt.textContent = score.value;
     }
     else {
         player.colliding = false;
