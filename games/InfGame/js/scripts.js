@@ -4,8 +4,10 @@ ctx.canvas.width = window.innerWidth /1.3;
 ctx.canvas.height = window.innerHeight /1.5;
 var player = {x:50,y:canvas.height-500,r:25,yv:0,jumping:false,colliding:false,pointGained:false};
 var container = {x:0,y:0,width:canvas.width,height:canvas.height - 25};
-var floor = {x:0,y:canvas.height - 25,width:canvas.width,height:25};
-var barrier = {x:canvas.width + 50,y:canvas.height - 150,width:50,height:125,xv:0};
+//ground 
+var grass = {x:0,y:canvas.height - 30,width:canvas.width,height:5};
+var dirt = {x:0,y:canvas.height - 25,width:canvas.width,height:25};
+var barrier = {x:canvas.width + 50,y:canvas.height - 152,width:50,height:125,xv:0};
 var score = {value:0,txt:document.getElementById('scoreTXT')};
 var highScore = {value:0,txt:document.getElementById('highScoreTXT')};
 
@@ -46,9 +48,11 @@ function containerDraw(){
 
 }
 
-function floorDraw() {
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(floor.x, floor.y, floor.width, floor.height);
+function groundDraw() {
+    ctx.fillStyle = "#604406";
+    ctx.fillRect(dirt.x, dirt.y, dirt.width, dirt.height);
+    ctx.fillStyle = "#06660c";
+    ctx.fillRect(grass.x, grass.y, grass.width, grass.height);
 }
 
 function playerDraw() {
@@ -65,7 +69,7 @@ function barrierDraw() {
 function draw() {
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.height);
     containerDraw();
-    floorDraw();
+    groundDraw();
     barrierDraw();
     playerDraw();
 
@@ -75,9 +79,9 @@ function draw() {
     player.yv *= 0.9;
 
     //stop player moving down
-    if (player.y + player.r > floor.y) {
+    if (player.y + player.r > grass.y) {
         player.jumping = false;
-        player.y = floor.y - player.r;
+        player.y = grass.y - player.r;
         player.yv = 0;
     }
 
@@ -88,7 +92,7 @@ function draw() {
     }
 
     //move barrier left
-    barrier.xv += 0.5;
+    barrier.xv += 0.4;
     barrier.x -= barrier.xv;
     barrier.xv *= 0.9;
 
