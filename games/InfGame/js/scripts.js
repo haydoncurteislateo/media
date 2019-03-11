@@ -2,7 +2,7 @@ var canvas = document.getElementById('myCanvas');
 var ctx = canvas.getContext('2d');
 ctx.canvas.width = window.innerWidth /1.3;
 ctx.canvas.height = window.innerHeight / 1.4;
-var player = {x:50,y:canvas.height-500,r:25,yv:0,jumping:false,colliding:false};
+var player = {x:50,y:canvas.height-500,r:25,yv:0,flying:false,colliding:false};
 var container = {x:0,y:0,width:canvas.width,height:canvas.height - 25};
 var grass = {x:0,y:canvas.height - 30,width:canvas.width,height:5};
 var dirt = {x:0,y:canvas.height - 25,width:canvas.width,height:25};
@@ -63,8 +63,6 @@ function playerDraw() {
     ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2, false);
     ctx.fillStyle = '#e86f25';
     ctx.fill();
-    ctx.fillStyle = "#232323";
-    ctx.fillRect((player.x - player.r) - 15, player.y - 15, 30, 35);
 }
 function barrierDraw() {
     ctx.fillStyle = "#f4d992";
@@ -97,13 +95,13 @@ function draw() {
         player.yv = 0;
     }
 
-    //jump
-    if (controller.up && player.jumping == false) {
-        player.jumping = true;
-        setInterval(jump, 250);
+    //fly
+    if (controller.up && player.flying == false) {
+        player.flying = true;
+        setInterval(fly, 250);
     }
 
-    if (player.jumping) {
+    if (player.flying) {
         player.yv -= 1.5;
     }
 
@@ -179,8 +177,8 @@ function generateRandomBarrier() {
     return randomBarrierVelocity;
 }
 
-function jump() {
-    player.jumping = false;
+function fly() {
+    player.flying = false;
 }
 
 function collisionDetection(player, barrier) {
