@@ -1,15 +1,18 @@
 var canvas = document.getElementById('myCanvas');
 var ctx = canvas.getContext('2d');
 ctx.canvas.width = window.innerWidth /1.3;
-ctx.canvas.height = window.innerHeight /1.5;
-var player = {x:50,y:canvas.height-500,r:25,yv:0,jumping:false,colliding:false,pointGained:false};
+ctx.canvas.height = window.innerHeight / 1.4;
+var player = {x:50,y:canvas.height-500,r:25,yv:0,jumping:false,colliding:false};
 var container = {x:0,y:0,width:canvas.width,height:canvas.height - 25};
-//ground 
 var grass = {x:0,y:canvas.height - 30,width:canvas.width,height:5};
 var dirt = {x:0,y:canvas.height - 25,width:canvas.width,height:25};
-var barrier = {x:canvas.width + 50,y:canvas.height - 152,width:50,height:125,xv:0};
+var barrier = [{x:canvas.width + 50, y: 0, width:50, height: canvas.height / 5, xv:0, pointGained:false}, {x:canvas.width + 50,y:canvas.height / 2 - canvas.height / 10,width:50,height: canvas.height / 5 ,xv:0, pointGained:false}, {x:canvas.width + 50,y: canvas.height - (canvas.height / 5 + 20) ,width:50,height: canvas.height / 5 ,xv:0, pointGained:false}];
 var score = {value:0,txt:document.getElementById('scoreTXT')};
 var highScore = {value:0,txt:document.getElementById('highScoreTXT')};
+var randomBarrierVelocityVar = [0.8,0.8,0.8];
+randomBarrierVelocityVar[0] = generateRandomBarrier();
+randomBarrierVelocityVar[1] = generateRandomBarrier();
+randomBarrierVelocityVar[2] = generateRandomBarrier();
 
 
 controller = {
@@ -58,12 +61,17 @@ function groundDraw() {
 function playerDraw() {
     ctx.beginPath();
     ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2, false);
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = '#e86f25';
     ctx.fill();
+    ctx.fillStyle = "#232323";
+    ctx.fillRect((player.x - player.r) - 15, player.y - 15, 30, 35);
 }
 function barrierDraw() {
-    ctx.fillStyle = "#514b33";
-    ctx.fillRect(barrier.x, barrier.y, barrier.width, barrier.height);
+    ctx.fillStyle = "#f4d992";
+
+    for (let i = 0; i < barrier.length; i++) {
+        ctx.fillRect(barrier[i].x, barrier[i].y, barrier[i].width, barrier[i].height);
+    }
 }
 
 function draw() {
@@ -78,43 +86,64 @@ function draw() {
     player.y += player.yv;
     player.yv *= 0.9;
 
-    //stop player moving down
+    //stop player moving down beyond ground
     if (player.y + player.r > grass.y) {
-        player.jumping = false;
         player.y = grass.y - player.r;
         player.yv = 0;
     }
 
-    //move player up
+    if (player.y - player.r < container.y) {
+        player.y = container.y + player.r;
+        player.yv = 0;
+    }
+
+    //jump
     if (controller.up && player.jumping == false) {
-        player.yv -=40;
         player.jumping = true;
+        setInterval(jump, 250);
+    }
+
+    if (player.jumping) {
+        player.yv -= 1.5;
     }
 
     //move barrier left
-    barrier.xv += 0.4;
-    barrier.x -= barrier.xv;
-    barrier.xv *= 0.9;
+    for (let i = 0; i < barrier.length; i++) {
 
-    //reset barrier when it hits edge
-    if (barrier.x  + barrier.width < 0) {
-        barrier.x = canvas.width + barrier.width;
-    }
+        barrier[i].xv += parseFloat(randomBarrierVelocityVar[i]);
+        barrier[i].x -= barrier[i].xv;
+        barrier[i].xv *= 0.9;
 
-    // add score
-    if ((Math.ceil((player.x + player.r) / 10) * 10) === (Math.ceil((barrier.x + barrier.width) / 10) * 10) && !collisionDetection(player, barrier)) {
-        if (!player.pointGained) {
+        // console.log(barrier[i].xv);
+
+        //reset barrier when it hits edge
+        if (barrier[i].x  + barrier[i].width < 0) {
+
+             //reset barrier Valuse
+
+            randomBarrierVelocityVar[i] = generateRandomBarrier();
+
+            barrier[i].x = canvas.width + barrier[i].width;
+            barrier[i].y = barrier[i].y;
+        }
+
+        // add score
+    if ((Math.ceil((player.x + player.r) / 10) * 10) == (Math.ceil((barrier[i].x + barrier[i].width) / 10) * 10) && !player.colliding) {
+        if (!barrier[i].pointGained) {
             score.value += 1;
             score.txt.textContent = score.value;
-            player.pointGained = true;
+            barrier[i].pointGained = true;
         }
-    }else {
-        player.pointGained = false;
     }
+    else {
+        barrier[i].pointGained = false;
+    }
+
     // console.log(Math.ceil(barrier.x + barrier.width / 10) * 10);
+    }
 
     //reset score when player hits barrier and set high score if score higher than last
-    if (collisionDetection(player, barrier)) {
+    if (collisionDetection(player, barrier[0]) || collisionDetection(player, barrier[1]) || collisionDetection(player, barrier[2])) {
         player.colliding = true;
 
         if (score.value > highScore.value) {
@@ -134,6 +163,25 @@ function draw() {
 
 draw();
 
+//Functions
+
+function generateRandomBarrier() {
+    let randomBarrierVelocity;
+
+    randomBarrierVelocity = (Math.random() * (0.9 - 0.4) + 0.4).toFixed(1);
+
+    for (let i = 0; i < randomBarrierVelocityVar.length; i++) {
+        while (randomBarrierVelocity == randomBarrierVelocityVar[i]) {
+            randomBarrierVelocity = (Math.random() * (0.9 - 0.4) + 0.4).toFixed(1);
+        }
+    }
+
+    return randomBarrierVelocity;
+}
+
+function jump() {
+    player.jumping = false;
+}
 
 function collisionDetection(player, barrier) {
     var distX = Math.abs(player.x - barrier.x-barrier.width/2);
@@ -151,6 +199,7 @@ function collisionDetection(player, barrier) {
 }
 
 
+
 window.addEventListener("keydown", controller.keyListener);
 window.addEventListener("keyup", controller.keyListener);
 window.requestAnimationFrame(draw, canvas);
@@ -162,6 +211,6 @@ if (!window.requestAnimationFrame) { // http://paulirish.com/2011/requestanimati
                                    window.msRequestAnimationFrame     || 
                                    function(callback, element) {
                                      window.setTimeout(function() { callback(Date.now()); }, 1000 / 60);
-                                   }
+                                   };
   }
   
